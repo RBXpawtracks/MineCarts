@@ -1,0 +1,117 @@
+version: 1.8.3
+
+#updates the config file.
+updateconfig: false
+
+#enable bananachunk.
+bananachunk: false
+
+#enable payday.
+payday: true
+
+#remove removeinvisible effect.
+removeinvisible: true
+
+#no quit message.
+noquitmessage: true
+
+#no join message.
+nojoinmessage: true
+
+#total loan on payday.
+loan: 230
+
+#enable NoLagg item removed.
+nolagg: true
+
+#amount TICKS between payment.
+paytime: 12000
+
+#bonus per player.
+bonus: 12
+
+#gangstajoin.
+gangstajoin: false
+
+#Cost of chunk command.
+chunk: 5
+
+#Cost of fastfood command.
+fastfood: 5
+
+#Cost of waterbreath command.
+waterbreath: 105
+
+#Cost of hop command.
+hop: 90
+
+#Cost of fast command.
+fast: 90
+
+#How much levels when pay4xp.
+addxp: 30
+
+#disable throw potion effects.
+disablepotion: true
+
+#permissions for bukkit usage.
+bukkitperms: true
+
+#disable dispenser's.
+disabledispenser: true
+
+#site url.
+site: www.minecart.nl
+
+#vote url.
+vote: vote.minecart.nl
+
+#Cost of the drugs.
+drugs: 10
+
+#remove vehicle when player exit's.
+exitvehicle: true
+
+#Cost for pay4xp command.
+compass: 40
+
+#Cost for pay4xp command.
+pay4xp: 300
+
+#Cost for pay4day command.
+pay4day: 100
+
+#Cost for pay4sun command.
+pay4sun: 120
+
+#disable item dropping.
+drop: true
+
+#check the gamemode.
+gamemodecheck: true
+
+#de-op on join.
+noop: true
+
+#disable blockburn.
+blockburn: true
+
+#disable blockignite.
+blockignite: true
+
+#remove vehicle when touches a block.
+vehiclecollision: true
+
+#response of ping.
+pingresponse: MineCarts.nl 24/7 Cracked server!
+
+#Random sound every 20 Minutes.
+trollmode: false
+
+#Console message every 20 Minutes.
+ping: true
+
+#Minecarts.nl system for changing slots.
+serverlist: true
+
+#Plugin by Thomasvt (Minecarts.nl)

@@ -1,0 +1,118 @@
+name: MineCarts
+main: me.thomasvt.minecarts.Minecarts
+version: 2.0
+depend: [ChatLogger, Vault]
+author: thomasvt
+
+commands:
+   purgeessentials:
+      description: Purge old essentials data.
+      permission: minecarts.purgeessentials
+      default: OP
+   setmail:
+      description: Set your email for password recovery.
+      permission: minecarts.setemail
+      aliases: [setemail]
+      default: OP
+   skull:
+      description: Make your skull.
+      permission: minecarts.skull
+      aliases: [head]
+      default: OP
+   compass:
+      description: Point you compass to your target.
+      permission: minecarts.compass
+      default: OP
+   attack:
+      description: Put server on attack mode.
+      permission: minecarts.attack
+      default: OP
+   scare:
+      description: Scare Everyone.
+      permission: minecarts.scare
+      default: OP
+   world:
+      description: See the world you are in now.
+      aliases: meworld
+      permission: minecarts.world
+      default: allow
+   tph:
+      description: Teleport here.
+      permission: minecarts.tph
+      default: OP
+   tpt:
+      description: Teleport to.
+      permission: minecarts.tpt
+      default: OP
+   minecartsreload:
+      description: Reload the config.
+      permission: minecarts.reload
+      default: OP
+   fastfood:
+      description: FastFood.
+      aliases: ff
+      permission: minecarts.fastfood
+      default: OP
+   waterbreath:
+      description: Pay for Underwater Breathing.
+      permission: minecarts.waterbreath
+      default: OP
+   pay4xp:
+      description: Pay for 30 XP levels.
+      permission: minecarts.pay4xp
+      default: OP
+   chunk:
+      description: Fixes chunk errors near u.
+      permission: minecarts.chunk
+      default: allow
+   pay4sun:
+      description: Pay for the Sun.
+      permission: minecarts.pay4sun
+      default: allow
+   pay4day:
+      description: Pay for the Day.
+      permission: minecarts.pay4day
+      default: allow
+   fast:
+      description: Make yourself faster.
+      permission: minecarts.fast
+      default: allow
+   hop:
+      description: Jump boosting.
+      permission: minecarts.hop
+      default: allow
+   site:
+      description: Gives the site name.
+      permission: minecarts.site
+      default: allow
+   drugs:
+      description: Take some drugs.
+      permission: minecarts.drugs
+      default: allow
+   hide:
+      description: Hide yourself.
+      permission: minecarts.hide
+      default: allow
+   vision:
+      description: Enables nightview.
+      permission: minecarts.vision
+      default: allow
+   vote:
+      description: Get link to vote.
+      permission: minecarts.vote
+      default: allow
+   c:
+      description: Get CREATIVE mode.
+      aliases: creative
+      permission: minecarts.c
+      default: OP
+   s:
+      description: Get SURVIVAL mode.
+      aliases: survival
+      permission: minecarts.s
+      default: OP
+   a:
+      description: Get ADVENTURE mode.
+      aliases: adventure
+      permission: minecarts.a
+      default: OP
