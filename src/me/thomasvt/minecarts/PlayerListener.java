@@ -4,7 +4,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -48,6 +50,16 @@ import org.bukkit.event.player.PlayerInteractEvent;
 		if (event.getPlayer().hasPermission("minecarts.flow"))
 			return;
 		event.setCancelled(true);
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+    public void onCreatureSpawn(CreatureSpawnEvent  event){
+		event.getEntity().setRemoveWhenFarAway(true);
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+    public void zombieAfterDeath(PlayerDeathEvent event){
+		minecarts.eventvoid.handlePlayerDeath(event);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)

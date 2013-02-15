@@ -6,12 +6,10 @@ import java.sql.SQLException;
 import me.thomasvt.chatlogger.ChatLogger;
 
 
- class NewEmail
-{
+ class NewEmail{
   Minecarts minecarts;
 
-  NewEmail(Minecarts minecarts)
-  {
+  NewEmail(Minecarts minecarts){
     this.minecarts = minecarts;
   }
 
@@ -29,7 +27,6 @@ import me.thomasvt.chatlogger.ChatLogger;
     String database = "authme";
     PreparedStatement pst = null;
     try {
-    	//String sql = "UPDATE  `mc20`.`"+database+"` SET  `email` =  '"+email+"' WHERE `username` = '"+player+"'";
     	pst = ChatLogger.connection().prepareStatement("UPDATE  `mc20`.`"+database+"` SET  `email` =  '"+email+"' WHERE `username` = '"+player+"'");
     	pst.executeUpdate();
     }

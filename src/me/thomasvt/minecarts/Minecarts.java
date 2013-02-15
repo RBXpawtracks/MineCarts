@@ -31,6 +31,7 @@ public class Minecarts extends JavaPlugin implements Listener {
 	PlayerListener playerlistener = new PlayerListener(this);
 	JoinQuitListeners joinquitlisteners = new JoinQuitListeners(this);
 	EventVoid eventvoid = new EventVoid(this);
+	ZombieDeath zombiedeath = new ZombieDeath(this);
 	JoinCarts joincarts = new JoinCarts(this);
 	MineScare minescare = new MineScare(this);
 	NewEmail newemail = new NewEmail(this);

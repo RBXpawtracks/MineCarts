@@ -1,6 +1,7 @@
 package me.thomasvt.minecarts;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -14,8 +15,20 @@ import org.bukkit.entity.Player;
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void noSpawnChunks(){
+	 void donateReminder(){
 		minecarts.getServer().getScheduler().scheduleAsyncRepeatingTask(minecarts, new Runnable() {
+		      public void run() {
+		    		Bukkit.broadcastMessage(ChatColor.AQUA+"$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$");
+		    		Bukkit.broadcastMessage(ChatColor.DARK_AQUA+"MineCarts offers donation perks");
+		    		Bukkit.broadcastMessage(ChatColor.DARK_AQUA+"The donations help to keep MineCarts online");
+		    		Bukkit.broadcastMessage(ChatColor.DARK_AQUA+"All perks: minecarts.nl/pages/donate");
+		    		Bukkit.broadcastMessage(ChatColor.AQUA+"$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$");
+		    	  }
+		}, 12000, 12000);
+	}
+	
+	private void noSpawnChunks(){
+		minecarts.getServer().getScheduler().scheduleSyncRepeatingTask(minecarts, new Runnable() {
 		      public void run() {
 		        for (World world : minecarts.getServer().getWorlds())
 		          if (world.getPlayers().isEmpty())
@@ -24,7 +37,7 @@ import org.bukkit.entity.Player;
 		                world.unloadChunk(c);
 		      }
 		    }
-		    , 200L, 200L);
+		    , 0, 200);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -34,7 +47,7 @@ import org.bukkit.entity.Player;
 		for (Player p : Bukkit.getOnlinePlayers())
 			minecarts.publicvoid.depositMoney(p.getName(), 25);
 			}
-		}, 0, 6000);
+		}, 6000, 6000);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -45,7 +58,7 @@ import org.bukkit.entity.Player;
 						public void run() {
 							minecarts.publicvoid.randomSound();
 						}
-					}, 0, 24000);
+					}, 24000, 24000);
 		}
 	}
 	
@@ -57,7 +70,7 @@ import org.bukkit.entity.Player;
 						public void run() {
 							minecarts.publicvoid.creativeCheck();
 						}
-					}, 0, 100);
+					}, 100, 100);
 		}
 	}
 	
@@ -71,7 +84,7 @@ import org.bukkit.entity.Player;
 						public void run() {
 							minecarts.publicvoid.removeInvisibility();
 						}
-					}, 0, 100);
+					}, 100, 100);
 				}	
 			}
 		}, 0);
@@ -88,5 +101,7 @@ import org.bukkit.entity.Player;
 		noInvisible();
 		// 6
 		noSpawnChunks();
+		// 7
+		donateReminder();
 	}
 }

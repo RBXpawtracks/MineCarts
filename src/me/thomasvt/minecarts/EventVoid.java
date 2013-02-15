@@ -5,9 +5,13 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -17,6 +21,17 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 	EventVoid(Minecarts minecarts) {
 		this.minecarts = minecarts;
+	}
+	
+	void handlePlayerDeath(PlayerDeathEvent event){
+			Player player = event.getEntity();
+			
+			LivingEntity zombie = (LivingEntity) player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE);
+			zombie.setRemoveWhenFarAway(true);
+			minecarts.zombiedeath.handleZombie(zombie, player.getName(), player.getInventory());
+			
+			if ((player.getKiller() == null) || !(player.getKiller() instanceof Player))
+				player.getKiller().playSound(player.getKiller().getLocation(), Sound.AMBIENCE_THUNDER, 1.0F, 1.0F);
 	}
 	
 	 void blockBow(PlayerInteractEvent e){
