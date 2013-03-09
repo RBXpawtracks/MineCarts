@@ -21,10 +21,10 @@ import org.bukkit.entity.Player;
 		    		Bukkit.broadcastMessage(ChatColor.AQUA+"$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$");
 		    		Bukkit.broadcastMessage(ChatColor.DARK_AQUA+"MineCarts offers donation perks");
 		    		Bukkit.broadcastMessage(ChatColor.DARK_AQUA+"The donations help to keep MineCarts online");
-		    		Bukkit.broadcastMessage(ChatColor.DARK_AQUA+"All perks: minecarts.nl/pages/donate");
+		    		Bukkit.broadcastMessage(ChatColor.DARK_AQUA+"All perks on: minecarts.nl/pages/donate");
 		    		Bukkit.broadcastMessage(ChatColor.AQUA+"$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$");
 		    	  }
-		}, 12000, 12000);
+		}, 11999, 12000);
 	}
 	
 	private void noSpawnChunks(){

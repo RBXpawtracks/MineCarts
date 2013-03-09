@@ -3,6 +3,9 @@ version: 1.8.3
 #updates the config file.
 updateconfig: false
 
+#Cost of guess game.
+guess: 30
+
 #enable bananachunk.
 bananachunk: false
 

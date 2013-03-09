@@ -3,12 +3,13 @@ package me.thomasvt.minecarts;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -20,10 +21,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
 		this.minecarts = minecarts;
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.NORMAL)
 	  public void MergedBlockPlace(BlockPlaceEvent event) {
 		minecarts.eventvoid.lavaBlocker(event);
-		minecarts.eventvoid.lavaBlocker(event);
+		minecarts.eventvoid.buildProtect(event);
+	  }
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	  public void MergedBlockBreak(BlockBreakEvent event) {
+		minecarts.eventvoid.buildProtect(event);
 	  }
 	
 	@EventHandler(priority = EventPriority.HIGH)
@@ -36,14 +42,20 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void DisablePluginsCommand(PlayerCommandPreprocessEvent event) {
+		minecarts.eventvoid.commandCooldown(event);
+		minecarts.eventvoid.noPlugins(event);
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void PlayerDropItemEvent(PlayerDropItemEvent event) {
 		if (event.getPlayer().hasPermission("minecarts.drop"))
 			return;
 		event.setCancelled(true);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void PlayerBucketEmptyEvent(PlayerBucketEmptyEvent event) {
 		if (!minecarts.getConfig().getBoolean("bukkitperms"))
 			return;
@@ -57,24 +69,21 @@ import org.bukkit.event.player.PlayerInteractEvent;
 		event.getEntity().setRemoveWhenFarAway(true);
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
-    public void zombieAfterDeath(PlayerDeathEvent event){
-		minecarts.eventvoid.handlePlayerDeath(event);
-	}
-	
 	@EventHandler(priority = EventPriority.HIGH)
 	public void MergedAsyncPlayerChat(AsyncPlayerChatEvent event) {
 		minecarts.eventvoid.chatNoCapital(event);
 		minecarts.eventvoid.chatNoRepeat(event);
+		minecarts.eventvoid.chatCooldown(event);
 		//minecarts.eventvoid.chatContainsName(event);
 	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
 	  public void PvpSound(EntityDamageByEntityEvent e){
-		if (e.isCancelled())
-			return;
-	    minecarts.publicvoid.pvpSound(e.getDamager(), e.getEntity());
-	    minecarts.publicvoid.bowSound(e.getDamager(), e.getEntity());
-	    minecarts.publicvoid.blindness(e.getEntity());
+		if (!e.isCancelled())
+			minecarts.publicvoid.pvpSound(e.getDamager(), e.getEntity());
+		if (!e.isCancelled())
+			minecarts.publicvoid.bowSound(e.getDamager(), e.getEntity());
+		if (!e.isCancelled())
+			minecarts.publicvoid.blindness(e.getEntity());
 	  }
 }

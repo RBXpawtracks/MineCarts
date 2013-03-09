@@ -1,5 +1,7 @@
 package me.thomasvt.minecarts;
 
+import java.util.ArrayList;
+
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,14 +26,16 @@ public class Minecarts extends JavaPlugin implements Listener {
 	
 	Economy econ = null;
 	String moneyname = "MineCredits";
+	
+	ArrayList<Player> cooldownguess = new ArrayList<Player>();
 
 	Shedule shedule = new Shedule(this);
 	PublicVoid publicvoid = new PublicVoid(this);
 	Listeners minecartslisteners = new Listeners(this);
 	PlayerListener playerlistener = new PlayerListener(this);
 	JoinQuitListeners joinquitlisteners = new JoinQuitListeners(this);
+	CostumItems costumitems = new CostumItems(this);
 	EventVoid eventvoid = new EventVoid(this);
-	ZombieDeath zombiedeath = new ZombieDeath(this);
 	JoinCarts joincarts = new JoinCarts(this);
 	MineScare minescare = new MineScare(this);
 	NewEmail newemail = new NewEmail(this);
@@ -54,6 +58,7 @@ public class Minecarts extends JavaPlugin implements Listener {
 		publicvoid.configCheck();
 		shedule.scheduler();
 		setupEconomy();
+		costumitems.addRecipes();
 	}
 	
 	private boolean setupEconomy() {
@@ -71,8 +76,9 @@ public class Minecarts extends JavaPlugin implements Listener {
 		getLogger().info("Disabling Minecarts.");
 	}
 
+	@SuppressWarnings("deprecation")
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-
+		
 		if (cmd.getName().equalsIgnoreCase("purgeessentials")) {
 			if (args.length == 0) {
 				sender.sendMessage(ChatColor.GOLD + "It's " + ChatColor.RED + "/purgeessentials " + ChatColor.GOLD + "days");
@@ -85,7 +91,7 @@ public class Minecarts extends JavaPlugin implements Listener {
 			}
 			publicvoid.removeInactiveEssentials(days);
 		}
-		 
+		
 		else if (cmd.getName().equalsIgnoreCase("skull")) {
 			Player player = (Player) sender;
 			if (args.length == 0) {
@@ -271,6 +277,68 @@ public class Minecarts extends JavaPlugin implements Listener {
 			sender.sendMessage(ChatColor.GREEN + "Finished reload on MineCarts plugin Config.yml");
 			sender.sendMessage(ChatColor.YELLOW + "-----------------------------------------");
 		}
+		
+		else if (cmd.getName().equalsIgnoreCase("guess")) {
+			if (sender instanceof Player) {
+				// WILL DO WHEN PLAYER = PLAYER
+				final Player p = (Player) sender;
+				
+				if (cooldownguess.contains(p)){
+					sender.sendMessage(ChatColor.RED+"You need to wait to guess again!");
+					return true;
+				}
+				
+				if (args.length == 0 || args.length > 1) {
+					sender.sendMessage(ChatColor.GOLD + "It's " + ChatColor.RED + "/guess " + ChatColor.GOLD + "0-9");
+					return true;
+				}
+				Player player = (Player) sender;
+				double cost = publicvoid.getInt("guess");
+				if (publicvoid.hasEnough(sender.getName(), cost)) {
+					sender.sendMessage(ChatColor.RED + "You cannot afford to guess the number! (" + cost + " " + moneyname + ")");
+					return false;
+				}
+				int guess;
+			    try {
+			        guess = Integer.parseInt(args[0]);
+			    }
+			    catch( Exception e ) {
+			    	sender.sendMessage(ChatColor.RED+"This isn't a number");
+			        return false;
+			    }
+
+			    if (guess > 9 || guess < 0 || guess == 0){
+					sender.sendMessage(ChatColor.RED +"The number needs to be 1-9");
+					return true;
+				}
+			    
+			    cooldownguess.add(p);
+				    Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+					      public void run() {
+					    	  cooldownguess.remove(p);
+					      }
+					    }, 1200);
+			    
+				if (publicvoid.getGuessnumber() == guess){
+					int win = (int)cost * 4;
+					publicvoid.depositMoney(player.getName(), win);
+					sender.sendMessage(ChatColor.GREEN+"Yay, that is the right number, you won "+win+ " " + moneyname);
+					Bukkit.broadcastMessage(ChatColor.GREEN + "Yay, "
+							+ sender.getName()
+							+ " guessed the right number and won " + win + " "
+							+ moneyname);
+					publicvoid.randomNumber();
+				}
+				else {
+					publicvoid.aSyncWithdraw(player.getName(), cost);
+					sender.sendMessage(ChatColor.RED + "Awh, that isn't the right number, you lost "+cost+ " " + moneyname );
+				}
+			} else {
+				// IF ITS NOT AN PLAYER
+				sender.sendMessage("[MineCarts] This command can only run from player");
+			}
+			return false;
+		}
 
 		else if (cmd.getName().equalsIgnoreCase("pay4xp")) {
 			if (sender instanceof Player) {
@@ -296,6 +364,7 @@ public class Minecarts extends JavaPlugin implements Listener {
 			}
 			return false;
 		}
+		
 		else if (cmd.getName().equalsIgnoreCase("drugs")) {
 			if (sender instanceof Player) {
 				Player player = (Player) sender;

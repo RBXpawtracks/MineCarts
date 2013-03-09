@@ -2,6 +2,7 @@ package me.thomasvt.minecarts;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -10,7 +11,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -35,8 +35,26 @@ import org.bukkit.potion.PotionEffectType;
 	}
 	
 	void disabler() {
-		minecarts.getServer().getScheduler().cancelAllTasks();
+		//minecarts.getServer().getScheduler().cancelAllTasks();
 		minecarts.getServer().getScheduler().cancelTasks(minecarts);
+	}
+	
+	public int getGuessnumber(){
+		if (guessnumber == -1)
+			randomNumber();
+		return guessnumber;
+	}
+	
+	private int guessnumber = -1;
+	
+	 void randomNumber(){
+		Random randomGenerator = new Random();
+		int random = randomGenerator.nextInt(9);
+		if (random > 9 || random < 0 || random == 0)
+			randomNumber();
+		else
+			guessnumber = random;
+		
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -51,10 +69,27 @@ import org.bukkit.potion.PotionEffectType;
 		}, 0);
 	}
 	
+	public int totalBuildersOnline(){
+		int builders = 0;
+		for (Player p : Bukkit.getOnlinePlayers()){
+			if (p.hasPermission("minecarts.builder"))
+				builders++;
+		}
+		return builders;
+	}
+	
+	public int totalStaffOnline(){
+		int staff = 0;
+		for (Player p : Bukkit.getOnlinePlayers()){
+			if (p.hasPermission("minecarts.staff"))
+				staff++;
+		}
+		return staff;
+	}
+	
 	public String totalOnline(){
 		String respond = minecarts.getServer().getOnlinePlayers().length + "/" + minecarts.getServer().getMaxPlayers();
 		return respond;
-		
 	}
 	
 	public int getInt(String s){
@@ -175,29 +210,40 @@ import org.bukkit.potion.PotionEffectType;
 	      int removeddatfiles = 0;
 	      int removedymlfiles = 0;
 
-	    File[] files = new File("plugins/Essentials/userdata").listFiles();
+	    File[] allyml = new File("plugins/Essentials/userdata").listFiles();
 
-	    for (File yml : files) {
+	    for (File yml : allyml) {
 	      Long logout = null;
 	      Long difference = null;
-	      YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(yml.getAbsolutePath()));
-	      logout = Long.valueOf(config.getLong("timestamps.logout"));
+	      //YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(yml.getAbsolutePath()));
+	      //logout = Long.valueOf(config.getLong("timestamps.logout"));
+	      logout = Long.valueOf(yml.lastModified());
 
 	      if ((logout != null) && (logout.longValue() != 0L)) {
 	        difference = Long.valueOf(timeNow.longValue() - logout.longValue());
 	        if (difference.longValue() >= dayToMs.longValue()) {
 	          yml.delete();
 	          removedymlfiles++;
-	          
-	          File dat = new File(worldname + "/players/" + yml.getName().replaceAll(".yml", ".dat"));
-	          
-						if (dat.exists()) {
-							dat.delete();
-							removeddatfiles++;
-						}
 					}
 				}
 			}
+	    
+	    File[] alldat = new File(worldname+"/players").listFiles();
+	    
+	    for (File dat : alldat) {
+		      Long logout = null;
+		      Long difference = null;
+		      logout = Long.valueOf(dat.lastModified());
+
+		      if ((logout != null) && (logout.longValue() != 0L)) {
+		        difference = Long.valueOf(timeNow.longValue() - logout.longValue());
+		        if (difference.longValue() >= dayToMs.longValue()) {
+		          dat.delete();
+		          removedymlfiles++;
+						}
+					}
+				}
+	    
 	    long totalTime = System.currentTimeMillis() - start;
 	    int totalDeleted = removeddatfiles + removedymlfiles;
 	    Bukkit.broadcastMessage(ChatColor.GOLD + "--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--");

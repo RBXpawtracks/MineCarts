@@ -5,14 +5,12 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
  class EventVoid {
@@ -23,16 +21,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 		this.minecarts = minecarts;
 	}
 	
-	void handlePlayerDeath(PlayerDeathEvent event){
-			Player player = event.getEntity();
-			
-			LivingEntity zombie = (LivingEntity) player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE);
-			zombie.setRemoveWhenFarAway(true);
-			minecarts.zombiedeath.handleZombie(zombie, player.getName(), player.getInventory());
-			
-			if ((player.getKiller() == null) || !(player.getKiller() instanceof Player))
-				player.getKiller().playSound(player.getKiller().getLocation(), Sound.AMBIENCE_THUNDER, 1.0F, 1.0F);
-	}
+	ArrayList<Player> fireworkCooldown = new ArrayList<Player>();
+	ArrayList<Player> commandCooldown = new ArrayList<Player>();
+	ArrayList<Player> chatCooldown = new ArrayList<Player>();
 	
 	 void blockBow(PlayerInteractEvent e){
 		if (e.getMaterial() == Material.BOW && !e.getPlayer().hasPermission("minecarts.shootbow"))
@@ -41,34 +32,74 @@ import org.bukkit.event.player.PlayerInteractEvent;
 	
 	 void enderDisabler(PlayerInteractEvent e) {
 		Material m = e.getMaterial();
+		if (m == Material.EYE_OF_ENDER && e.getClickedBlock().getType() == Material.ENDER_PORTAL_FRAME){
+			return;
+		}
 		if (m == Material.ENDER_PEARL || m == Material.EYE_OF_ENDER || m == Material.EXP_BOTTLE)
 			e.setCancelled(true);
 	}
-	 ArrayList<Player> cooldownplayers = new ArrayList<Player>();
-
+	 
+	 void noPlugins(PlayerCommandPreprocessEvent e){
+			String cmd = e.getMessage();
+			if (cmd.matches("/pl") || cmd.matches("/plugins")){
+					if (e.getPlayer().hasPermission("minecarts.plugins"))
+						return;
+					else
+						e.setCancelled(true);
+			}
+	 }
+	 
+	 @SuppressWarnings("deprecation")
+	void commandCooldown(PlayerCommandPreprocessEvent e){
+		 final Player p = e.getPlayer();
+		 if (commandCooldown.contains(p)){
+			 e.setCancelled(true);
+			 p.sendMessage(ChatColor.RED+"Please wait before typing a new command");
+			 return;
+		 }
+		 commandCooldown.add(p);
+		    Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
+			      public void run() {
+			    	  commandCooldown.remove(p);
+			      }
+			    }, 40);
+	 }
+	 
+	 @SuppressWarnings("deprecation")
+	void chatCooldown(AsyncPlayerChatEvent e){
+		 final Player p = e.getPlayer();
+		 if (chatCooldown.contains(p)){
+			 e.setCancelled(true);
+			 p.sendMessage(ChatColor.RED+"Please wait before typing a new message");
+			 return;
+		 }
+		 chatCooldown.add(p);
+		    Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
+			      public void run() {
+			    	  chatCooldown.remove(p);
+			      }
+			    }, 10);
+	 }
+	 
+	@SuppressWarnings("deprecation")
 	void fireWorkSlowDown(PlayerInteractEvent e) {
-		Player p = e.getPlayer();
+		final Player p = e.getPlayer();
 		if (p.getItemInHand().getType() != Material.FIREWORK)
 			return;
 		if (p.hasPermission("minecarts.fastfirework"))
 			return;
 		if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
 			return;
-		if (this.cooldownplayers.contains(p)) {
+		if (fireworkCooldown.contains(p)) {
 			e.setCancelled(true);
 			p.sendMessage(ChatColor.RED
 					+ "You need to wait before launching another firework!");
 			return;
 		}
-		this.cooldownplayers.add(p);
-		removeFromList(p);
-	}
-	
-	@SuppressWarnings("deprecation")
-	public void removeFromList(final Player p){
+		fireworkCooldown.add(p);
 	    Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
 		      public void run() {
-		        cooldownplayers.remove(p);
+		    	  fireworkCooldown.remove(p);
 		      }
 		    }, 60);
 	}
@@ -82,6 +113,24 @@ import org.bukkit.event.player.PlayerInteractEvent;
 		if (e.getMaterial() == Material.POTION && !e.getPlayer().hasPermission("minecarts.potion"))
 			e.setCancelled(true);
 	}
+	 
+	 void buildProtect(BlockBreakEvent e){
+		 String w = e.getBlock().getWorld().getName();
+		 Player p = e.getPlayer();
+		 if (!p.hasPermission("minecarts.build."+w)){
+			 e.setCancelled(true);
+			 e.getPlayer().sendMessage(ChatColor.RED+"You don't have permissions to build in this world");
+		 }
+	 }
+	 
+	 void buildProtect(BlockPlaceEvent e){
+		 String w = e.getBlock().getWorld().getName();
+		 Player p = e.getPlayer();
+		 if (!p.hasPermission("minecarts.build."+w)){
+			 e.setCancelled(true);
+			 e.getPlayer().sendMessage(ChatColor.RED+"You don't have permissions to build in this world");
+		 }
+	 }
 	
 	   void lavaBlocker(BlockPlaceEvent e) {
 		if (e.getPlayer().hasPermission("minecarts.lava"))
@@ -102,6 +151,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 		}
 		
 		 void chatNoCapital(AsyncPlayerChatEvent e) {
+			 if (e.getMessage().contains(":") && e.getMessage().length() <3)
+				 return;
 			if (!e.getPlayer().hasPermission("minecarts.caps"))
 				e.setMessage(e.getMessage().toLowerCase());
 		}

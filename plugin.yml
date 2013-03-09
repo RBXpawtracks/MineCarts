@@ -1,10 +1,14 @@
 name: MineCarts
 main: me.thomasvt.minecarts.Minecarts
-version: 2.0
-depend: [ChatLogger, Vault]
+version: 2.1
+softdepend: [ChatLogger, Vault]
 author: thomasvt
 
 commands:
+   guess:
+      description: A game to guess the number
+      permission: minecarts.guess
+      default: OP
    purgeessentials:
       description: Purge old essentials data.
       permission: minecarts.purgeessentials
