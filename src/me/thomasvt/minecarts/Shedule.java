@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 	Shedule(Minecarts minecarts) {
 		this.minecarts = minecarts;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	 void donateReminder(){
 		minecarts.getServer().getScheduler().scheduleAsyncRepeatingTask(minecarts, new Runnable() {
@@ -24,7 +24,7 @@ import org.bukkit.entity.Player;
 		    		Bukkit.broadcastMessage(ChatColor.DARK_AQUA+"All perks on: minecarts.nl/pages/donate");
 		    		Bukkit.broadcastMessage(ChatColor.AQUA+"$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$");
 		    	  }
-		}, 11999, 12000);
+		}, 12000, 12000);
 	}
 	
 	private void noSpawnChunks(){
@@ -41,6 +41,19 @@ import org.bukkit.entity.Player;
 	}
 	
 	@SuppressWarnings("deprecation")
+	private void clearList(){
+		minecarts.getServer().getScheduler().scheduleAsyncRepeatingTask(minecarts, new Runnable() {
+			public void run(){
+		minecarts.cooldownguess.clear();
+		minecarts.listeners.dispensecooldown.clear();
+		minecarts.eventvoid.chatCooldown.clear();
+		minecarts.eventvoid.commandCooldown.clear();
+		minecarts.eventvoid.fireworkCooldown.clear();
+			}
+		}, 6000, 6000);
+	}
+	
+	@SuppressWarnings("deprecation")
 	private void payDay(){
 		minecarts.getServer().getScheduler().scheduleAsyncRepeatingTask(minecarts, new Runnable() {
 			public void run(){
@@ -51,57 +64,20 @@ import org.bukkit.entity.Player;
 	}
 	
 	@SuppressWarnings("deprecation")
-	private void trollmode(){
-		if (minecarts.getConfig().getBoolean("trollmode")) {
-			minecarts.getServer().getScheduler().scheduleAsyncRepeatingTask(minecarts,
-					new Runnable() {
-						public void run() {
-							minecarts.publicvoid.randomSound();
-						}
-					}, 24000, 24000);
-		}
+	private void gmCheck() {
+		minecarts.getServer().getScheduler().scheduleAsyncRepeatingTask(minecarts, new Runnable() {
+					public void run() {
+						minecarts.publicvoid.creativeCheck();
+						minecarts.publicvoid.removeInvisibility();
+					}
+				}, 100, 100);
 	}
 	
-	@SuppressWarnings("deprecation")
-	private void gmCheck(){
-		if (minecarts.getConfig().getBoolean("gamemodecheck")) {
-			minecarts.getServer().getScheduler().scheduleAsyncRepeatingTask(minecarts,
-					new Runnable() {
-						public void run() {
-							minecarts.publicvoid.creativeCheck();
-						}
-					}, 100, 100);
-		}
-	}
-	
-	@SuppressWarnings("deprecation")
-	private void noInvisible(){
-		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
-			public void run() {
-		if (minecarts.getConfig().getBoolean("removeinvisible")) {
-			minecarts.getServer().getScheduler().scheduleSyncRepeatingTask(minecarts,
-					new Runnable() {
-						public void run() {
-							minecarts.publicvoid.removeInvisibility();
-						}
-					}, 100, 100);
-				}	
-			}
-		}, 0);
-	}
-
 	 void scheduler() {
-		// 2
-		trollmode();
-		// 3
 		payDay();
-		// 4
 		gmCheck();
-		// 5
-		noInvisible();
-		// 6
 		noSpawnChunks();
-		// 7
 		donateReminder();
+		clearList();
 	}
 }

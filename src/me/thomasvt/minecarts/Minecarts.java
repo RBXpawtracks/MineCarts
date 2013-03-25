@@ -34,10 +34,13 @@ public class Minecarts extends JavaPlugin implements Listener {
 	Listeners minecartslisteners = new Listeners(this);
 	PlayerListener playerlistener = new PlayerListener(this);
 	JoinQuitListeners joinquitlisteners = new JoinQuitListeners(this);
+	TrainTicket trainticket = new TrainTicket(this);
 	CostumItems costumitems = new CostumItems(this);
 	EventVoid eventvoid = new EventVoid(this);
 	JoinCarts joincarts = new JoinCarts(this);
+	Listeners listeners = new Listeners(this);
 	MineScare minescare = new MineScare(this);
+	LogClear logclear = new LogClear(this);
 	NewEmail newemail = new NewEmail(this);
 	
 	public int getInt(String conf){
@@ -59,6 +62,7 @@ public class Minecarts extends JavaPlugin implements Listener {
 		shedule.scheduler();
 		setupEconomy();
 		costumitems.addRecipes();
+		logclear.startShedule();
 	}
 	
 	private boolean setupEconomy() {
@@ -109,7 +113,7 @@ public class Minecarts extends JavaPlugin implements Listener {
 			}
 			minescare.scare(sender,args[0]);
 		}
-
+		
 		else if (cmd.getName().equalsIgnoreCase("attack")) {
 			if (args.length > 0) {
 				if (attack = true) {

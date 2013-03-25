@@ -1,10 +1,10 @@
 package me.thomasvt.minecarts;
 
 import java.util.ArrayList;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -12,6 +12,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
  class EventVoid {
 
@@ -25,23 +27,25 @@ import org.bukkit.event.player.PlayerInteractEvent;
 	ArrayList<Player> commandCooldown = new ArrayList<Player>();
 	ArrayList<Player> chatCooldown = new ArrayList<Player>();
 	
-	 void blockBow(PlayerInteractEvent e){
+	void blockBow(PlayerInteractEvent e){
 		if (e.getMaterial() == Material.BOW && !e.getPlayer().hasPermission("minecarts.shootbow"))
 			e.setCancelled(true);
 	}
-	
-	 void enderDisabler(PlayerInteractEvent e) {
+	 
+	void enderDisabler(PlayerInteractEvent e) {
 		Material m = e.getMaterial();
-		if (m == Material.EYE_OF_ENDER && e.getClickedBlock().getType() == Material.ENDER_PORTAL_FRAME){
-			return;
+		if (m == Material.EYE_OF_ENDER || m == Material.EXP_BOTTLE|| m == Material.ENDER_PEARL){
+		e.setCancelled(true);
+		if (m == Material.ENDER_PEARL) {
+			if (e.getPlayer().getWorld().getName().matches("pvp"))
+				e.setCancelled(false);
+			}
 		}
-		if (m == Material.ENDER_PEARL || m == Material.EYE_OF_ENDER || m == Material.EXP_BOTTLE)
-			e.setCancelled(true);
 	}
 	 
 	 void noPlugins(PlayerCommandPreprocessEvent e){
 			String cmd = e.getMessage();
-			if (cmd.matches("/pl") || cmd.matches("/plugins")){
+			if (cmd.matches("/?") || cmd.matches("/pl") || cmd.matches("/plugins")){
 					if (e.getPlayer().hasPermission("minecarts.plugins"))
 						return;
 					else
@@ -52,10 +56,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 	 @SuppressWarnings("deprecation")
 	void commandCooldown(PlayerCommandPreprocessEvent e){
 		 final Player p = e.getPlayer();
+		 if (p.hasPermission("minecarts.fastcommand"))
+			 return;
 		 if (commandCooldown.contains(p)){
 			 e.setCancelled(true);
 			 p.sendMessage(ChatColor.RED+"Please wait before typing a new command");
-			 return;
+			 commandCooldown.remove(p);
 		 }
 		 commandCooldown.add(p);
 		    Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
@@ -68,17 +74,19 @@ import org.bukkit.event.player.PlayerInteractEvent;
 	 @SuppressWarnings("deprecation")
 	void chatCooldown(AsyncPlayerChatEvent e){
 		 final Player p = e.getPlayer();
+		 if (p.hasPermission("minecarts.fastchat"))
+			 return;
 		 if (chatCooldown.contains(p)){
 			 e.setCancelled(true);
 			 p.sendMessage(ChatColor.RED+"Please wait before typing a new message");
-			 return;
+			 chatCooldown.remove(p);
 		 }
 		 chatCooldown.add(p);
 		    Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
 			      public void run() {
 			    	  chatCooldown.remove(p);
 			      }
-			    }, 10);
+			    }, 20);
 	 }
 	 
 	@SuppressWarnings("deprecation")
@@ -104,20 +112,25 @@ import org.bukkit.event.player.PlayerInteractEvent;
 		    }, 60);
 	}
 	
-	 void noSnowball(PlayerInteractEvent e) {
-		if (e.getMaterial() == Material.SNOW_BALL && !e.getPlayer().hasPermission("minecarts.snowball"))
+	void noSnowball(PlayerInteractEvent e) {
+		if (e.getMaterial() != Material.SNOW_BALL)
+			return;
+		Player p = e.getPlayer();
+		if (!p.hasPermission("minecarts.snowball"))
 			e.setCancelled(true);
 	}
 	
 	 void potionDisabler(PlayerInteractEvent e) {
-		if (e.getMaterial() == Material.POTION && !e.getPlayer().hasPermission("minecarts.potion"))
+		if (e.getMaterial() != Material.POTION)
+			return;
+		Player p = e.getPlayer();
+		if (!p.hasPermission("minecarts.potion"))
 			e.setCancelled(true);
 	}
 	 
 	 void buildProtect(BlockBreakEvent e){
-		 String w = e.getBlock().getWorld().getName();
 		 Player p = e.getPlayer();
-		 if (!p.hasPermission("minecarts.build."+w)){
+		 if (!p.hasPermission("minecarts.build."+e.getBlock().getWorld().getName())){
 			 e.setCancelled(true);
 			 e.getPlayer().sendMessage(ChatColor.RED+"You don't have permissions to build in this world");
 		 }
@@ -136,7 +149,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 		if (e.getPlayer().hasPermission("minecarts.lava"))
 			return;
 	    if ((e.getBlockPlaced().getType() == Material.LAVA) || (e.getBlockPlaced().getType() == Material.STATIONARY_LAVA)) {
-	    	minecarts.getLogger().info("Prevented " + e.getPlayer().getName() + " from placing lava");
 	        e.setCancelled(true);
 	    }
 	  }
@@ -158,16 +170,60 @@ import org.bukkit.event.player.PlayerInteractEvent;
 		}
 		
 		private String lastmessage;
-		public void chatNoRepeat(AsyncPlayerChatEvent e) {
+		 void chatNoRepeat(AsyncPlayerChatEvent e) {
 			String msg = e.getMessage().toLowerCase();
 			if (msg.equals(lastmessage))
 				e.setCancelled(true);
 			lastmessage = msg;
 	}
 
-		 void chatContainsName(AsyncPlayerChatEvent e) {
-			if(e.isCancelled())
+		 void chatdontSay(AsyncPlayerChatEvent e) {
+			if (e.getMessage().contains("lagg")){
+				e.setMessage(e.getMessage().replaceAll("lagg", ""));
 				return;
-			minecarts.publicvoid.chatContainsName(e.getMessage(), e.getRecipients());
-	}
+			}
+			else if (e.getMessage().contains("lag"))
+				e.setMessage(e.getMessage().replaceAll("lag", ""));
+		}
+
+		 void spyClock(PlayerInteractEvent e) {
+			Player p = e.getPlayer();
+			if (e.getMaterial().getId() == 347){
+				if (p.getWorld().getName().matches("tf2"))
+					if (p.hasPermission("tf2.button.donator")){
+						if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)){
+							p.sendMessage(ChatColor.ITALIC+"Your are already vanished!");
+							return;
+						}
+						p.sendMessage(ChatColor.ITALIC+"Your are now vanished!");
+						p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,400, 1));
+						minecarts.publicvoid.spyClock(p, 15);
+					}
+			}
+		}
+
+		 void tf2NoLoss(PlayerCommandPreprocessEvent e) {
+			String w = e.getPlayer().getWorld().getName();
+			if (!e.getMessage().contains("/tf2"))
+				return;
+			if (w.matches("pvp") || w.matches("pvp_nether")){
+					e.getPlayer().sendMessage(ChatColor.DARK_AQUA+"Doing this in pvp world will wipe your inventory!");
+					e.setCancelled(true);
+			}
+		}
+
+		 void pvpChest(PlayerInteractEvent e) {
+			Block block = e.getClickedBlock();
+			if (block == null || block.getTypeId() != 54)
+				return;
+			if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
+				return;
+			if (!block.getWorld().getName().matches("pvp"))
+				return;
+			else {
+				e.setCancelled(false);
+				e.getPlayer().sendMessage(ChatColor.ITALIC + "You successfully made the chest open!");
+			}
+			
+		}
 }

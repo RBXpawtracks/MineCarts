@@ -3,7 +3,6 @@ package me.thomasvt.minecarts;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -35,7 +34,6 @@ import org.bukkit.potion.PotionEffectType;
 	}
 	
 	void disabler() {
-		//minecarts.getServer().getScheduler().cancelAllTasks();
 		minecarts.getServer().getScheduler().cancelTasks(minecarts);
 	}
 	
@@ -116,29 +114,13 @@ import org.bukkit.potion.PotionEffectType;
 		}, 25);
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void removeInvisibility(){
-		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
-			public void run() {
+	 void removeInvisibility(){
 				for (Player p : Bukkit.getOnlinePlayers())
-					p.removePotionEffect(PotionEffectType.INVISIBILITY);
+					if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)){
+						if (!p.hasPermission("minecarts.invisible"))
+							p.removePotionEffect(PotionEffectType.INVISIBILITY);
 					}
-				}, 0);
 	}
-	
-	@SuppressWarnings("deprecation")
-	public void chatContainsName(final String m,final Set<Player> r) {
-		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
-			public void run() {
-		ArrayList<String> rec = new ArrayList<String>();
-		for (Player p : r)
-			rec.add(p.getName());
-		for (Player p : Bukkit.getOnlinePlayers())
-			if (m.contains(p.getName()))
-				p.playSound(p.getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
-			}
-		}, 0);
-}
 	
 	@SuppressWarnings("deprecation")
 	void pvpSound(final Entity damagerEn,final Entity victimEn) {
@@ -201,56 +183,67 @@ import org.bukkit.potion.PotionEffectType;
 	void removeInactiveEssentials(final int days) {
 		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
 			public void run() {
-		Bukkit.broadcastMessage("Starting to remove old player files..");
 		long start = System.currentTimeMillis();
 	    Long timeNow = Long.valueOf(System.currentTimeMillis());
 	    Long dayToMs = Long.valueOf(86400000 * days);
 	    String worldname = Bukkit.getServer().getWorlds().get(0).getName();
+	    int removed = 0;
+	      
+	    ArrayList<File> files = new ArrayList<File>();
+	    Bukkit.broadcastMessage(ChatColor.ITALIC+"Removing inactive player files (1/3)");
+	    for (File f : new File("plugins/Essentials/userdata").listFiles())
+	    	files.add(f);
+	    for (File f : new File(worldname+"/players").listFiles())
+	    	files.add(f);
 	    
-	      int removeddatfiles = 0;
-	      int removedymlfiles = 0;
+	    for (File f : new File("plugins/Multiverse-Inventories/worlds/hg").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/Multiverse-Inventories/worlds/flatplus").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/Multiverse-Inventories/groups/plots").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/Multiverse-Inventories/worlds/plots").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/Multiverse-Inventories/worlds/bplots").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/Multiverse-Inventories/worlds/hugeplots").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/uSkyBlock/players").listFiles())
+	    	files.add(f);
 
-	    File[] allyml = new File("plugins/Essentials/userdata").listFiles();
-
-	    for (File yml : allyml) {
-	      Long logout = null;
-	      Long difference = null;
-	      //YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(yml.getAbsolutePath()));
-	      //logout = Long.valueOf(config.getLong("timestamps.logout"));
-	      logout = Long.valueOf(yml.lastModified());
-
-	      if ((logout != null) && (logout.longValue() != 0L)) {
-	        difference = Long.valueOf(timeNow.longValue() - logout.longValue());
-	        if (difference.longValue() >= dayToMs.longValue()) {
-	          yml.delete();
-	          removedymlfiles++;
-					}
-				}
-			}
 	    
-	    File[] alldat = new File(worldname+"/players").listFiles();
+	    /*
+	    for (File f : new File("plugins/Multiverse-Inventories/worlds/pvp").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/Multiverse-Inventories/worlds/world").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/Multiverse-Inventories/groups/default").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/Multiverse-Inventories/groups/pvp").listFiles())
+	    	files.add(f);
+	    for (File f : new File("plugins/Multiverse-Inventories/players").listFiles())
+	    	files.add(f);
+	    */
 	    
-	    for (File dat : alldat) {
+	    Bukkit.broadcastMessage(ChatColor.ITALIC+"Removing inactive player files (2/3)");
+	    for (File f : files) {
 		      Long logout = null;
 		      Long difference = null;
-		      logout = Long.valueOf(dat.lastModified());
+		      logout = Long.valueOf(f.lastModified());
 
 		      if ((logout != null) && (logout.longValue() != 0L)) {
 		        difference = Long.valueOf(timeNow.longValue() - logout.longValue());
 		        if (difference.longValue() >= dayToMs.longValue()) {
-		          dat.delete();
-		          removedymlfiles++;
+		          f.delete();
+		          removed++;
 						}
 					}
 				}
-	    
+	    Bukkit.broadcastMessage(ChatColor.ITALIC+"Removing inactive player files (3/3)");
 	    long totalTime = System.currentTimeMillis() - start;
-	    int totalDeleted = removeddatfiles + removedymlfiles;
 	    Bukkit.broadcastMessage(ChatColor.GOLD + "--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--");
 	    Bukkit.broadcastMessage(ChatColor.AQUA + "Removing old player files done, took: " + totalTime + " ms");
-	    Bukkit.broadcastMessage(ChatColor.AQUA + "Total .dat files deleted: " + removeddatfiles );
-	    Bukkit.broadcastMessage(ChatColor.AQUA + "Total .yml files deleted: " + removedymlfiles );
-	    Bukkit.broadcastMessage(ChatColor.AQUA + "Total files deleted: " + totalDeleted );
+	    Bukkit.broadcastMessage(ChatColor.AQUA + "Total files deleted: " + removed );
 	    Bukkit.broadcastMessage(ChatColor.GOLD + "--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--");
 					}
 				}, 0);
@@ -310,11 +303,42 @@ import org.bukkit.potion.PotionEffectType;
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (p == null)
 				return;
-			if (p.getGameMode() == GameMode.CREATIVE && !p.hasPermission("minecarts.c")) {
+			if (p.getGameMode() == GameMode.CREATIVE){
+				if (p.hasPermission("minecarts.c"))
+					return;
+				else
 				p.setGameMode(GameMode.SURVIVAL);
 				p.sendMessage(ChatColor.BOLD + "Dont try to get illegal creative!");
-							}
-						}
+			}
+		}
+	}
+	
+	private void endAfterSpy(Player p){
+		p.sendMessage(ChatColor.ITALIC+"You are no longer invisible!");
+		p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1F, 1F);
+		p.removePotionEffect(PotionEffectType.INVISIBILITY);
+		p.setLevel(0);
+	}
+	
+	@SuppressWarnings("deprecation")
+	  void spyClock(final Player p, final int timer) {
+		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
+			 public void run() {
+				 if (p == null)
+					 return;
+				 if (!p.hasPotionEffect(PotionEffectType.INVISIBILITY)){
+					 endAfterSpy(p);
+					 return;
+				 }
+				 if (timer == 0){
+					 endAfterSpy(p);
+					 return;
+				 }
+				 int t = timer - 1;
+				 p.setLevel(t);
+				 spyClock(p, t);
+			 }
+		}, 20);
 	}
 
 	@SuppressWarnings("deprecation")
