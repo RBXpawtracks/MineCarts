@@ -35,6 +35,7 @@ public class Minecarts extends JavaPlugin implements Listener {
 	PlayerListener playerlistener = new PlayerListener(this);
 	JoinQuitListeners joinquitlisteners = new JoinQuitListeners(this);
 	TrainTicket trainticket = new TrainTicket(this);
+	DoubleJump doublejump = new DoubleJump(this);
 	CostumItems costumitems = new CostumItems(this);
 	EventVoid eventvoid = new EventVoid(this);
 	JoinCarts joincarts = new JoinCarts(this);
@@ -52,6 +53,7 @@ public class Minecarts extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(minecartslisteners, this);
 		getServer().getPluginManager().registerEvents(playerlistener, this);
 		getServer().getPluginManager().registerEvents(joinquitlisteners, this);
+		getServer().getPluginManager().registerEvents(doublejump, this);
 		getServer().getPluginManager().registerEvents(joincarts, this);
 		getServer().getPluginManager().registerEvents(this, this);
 	}

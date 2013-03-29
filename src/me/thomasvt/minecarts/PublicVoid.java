@@ -7,10 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -55,10 +53,9 @@ import org.bukkit.potion.PotionEffectType;
 		
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void resendChunk(Player p){
 		final Player pl = p;
-		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
+		minecarts.getServer().getScheduler().scheduleSyncDelayedTask(minecarts, new Runnable() {
 			public void run() {
 		World world = pl.getWorld();
 		Chunk chunk = world.getChunkAt(pl.getLocation());
@@ -121,63 +118,6 @@ import org.bukkit.potion.PotionEffectType;
 							p.removePotionEffect(PotionEffectType.INVISIBILITY);
 					}
 	}
-	
-	@SuppressWarnings("deprecation")
-	void pvpSound(final Entity damagerEn,final Entity victimEn) {
-		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
-			public void run() {
-				if (damagerEn instanceof Player && victimEn instanceof Player){
-				      Player damager = (Player)damagerEn;
-				      if (hasSword(damager) && hasArmour((Player)victimEn))
-				        playPvpSound(damager);
-				    }
-					}
-				}, 0);
-	}
-	
-	@SuppressWarnings("deprecation")
-	public void bowSound(final Entity damager,final Entity victim) {
-		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
-			public void run() {
-				
-			    if ((damager instanceof Arrow)) {
-			        Arrow arrow = (Arrow)damager;
-
-			        if (arrow.getShooter() instanceof Player && victim instanceof Player)
-			        	((Player)arrow.getShooter()).playSound(damager.getLocation(), Sound.CAT_HIT, 1.0F, 1.0F);
-						}
-					}
-				}, 0);
-	}
-	
-	private int lastsound;
-	private void playPvpSound(Player damager){
-		if (lastsound > 2 || lastsound == 0)
-			lastsound = 1;
-		if (lastsound == 1)
-			damager.playSound(damager.getLocation(), Sound.ANVIL_LAND, 1.0F, 2.0F);
-		lastsound++;
-	}
-	
-	  private boolean hasSword(Player p){
-		if ((p.getItemInHand().getType().equals(Material.DIAMOND_SWORD))
-				|| (p.getItemInHand().getType().equals(Material.GOLD_SWORD))
-				|| (p.getItemInHand().getType().equals(Material.IRON_SWORD))
-				|| (p.getItemInHand().getType().equals(Material.STONE_SWORD)))
-			return true;
-		else
-			return false;
-	  }
-
-	  private boolean hasArmour(Player p){
-		if ((p.getInventory().getChestplate() != null)
-				|| (p.getInventory().getHelmet() != null)
-				|| (p.getInventory().getLeggings() != null)
-				|| (p.getInventory().getBoots() != null))
-			return true;
-		else
-			return false;
-	  }
 	
 	@SuppressWarnings("deprecation")
 	void removeInactiveEssentials(final int days) {
@@ -320,9 +260,8 @@ import org.bukkit.potion.PotionEffectType;
 		p.setLevel(0);
 	}
 	
-	@SuppressWarnings("deprecation")
 	  void spyClock(final Player p, final int timer) {
-		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
+		minecarts.getServer().getScheduler().scheduleSyncDelayedTask(minecarts, new Runnable() {
 			 public void run() {
 				 if (p == null)
 					 return;
@@ -341,13 +280,8 @@ import org.bukkit.potion.PotionEffectType;
 		}, 20);
 	}
 
-	@SuppressWarnings("deprecation")
-	  void blindness(final Entity e) {
-		minecarts.getServer().getScheduler().scheduleAsyncDelayedTask(minecarts, new Runnable() {
-			 public void run() {
-				if (e instanceof Player)
-					((Player)e).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1));
-					}
-				}, 0);
+	void blindness(final Entity e) {
+		if (e instanceof Player)
+			((Player) e).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1));
 	}
 }

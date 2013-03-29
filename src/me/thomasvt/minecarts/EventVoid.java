@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -177,53 +176,46 @@ import org.bukkit.potion.PotionEffectType;
 			lastmessage = msg;
 	}
 
-		 void chatdontSay(AsyncPlayerChatEvent e) {
-			if (e.getMessage().contains("lagg")){
-				e.setMessage(e.getMessage().replaceAll("lagg", ""));
-				return;
-			}
-			else if (e.getMessage().contains("lag"))
-				e.setMessage(e.getMessage().replaceAll("lag", ""));
-		}
+	void chatdontSay(AsyncPlayerChatEvent e) {
+		if (e.getMessage().contains("lagg")) {
+			e.setMessage(e.getMessage().replaceAll("lagg", ""));
+			return;
+		} else if (e.getMessage().contains("lag"))
+			e.setMessage(e.getMessage().replaceAll("lag", ""));
+	}
 
-		 void spyClock(PlayerInteractEvent e) {
-			Player p = e.getPlayer();
-			if (e.getMaterial().getId() == 347){
-				if (p.getWorld().getName().matches("tf2"))
-					if (p.hasPermission("tf2.button.donator")){
-						if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)){
-							p.sendMessage(ChatColor.ITALIC+"Your are already vanished!");
-							return;
-						}
-						p.sendMessage(ChatColor.ITALIC+"Your are now vanished!");
-						p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,400, 1));
-						minecarts.publicvoid.spyClock(p, 15);
+	void spyClock(PlayerInteractEvent e) {
+		Player p = e.getPlayer();
+		if (e.getMaterial().getId() == 347) {
+			if (p.getWorld().getName().matches("tf2"))
+				if (p.hasPermission("tf2.button.donator")) {
+					if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+						p.sendMessage(ChatColor.ITALIC + "Your are already vanished!");
+						return;
 					}
-			}
+					p.sendMessage(ChatColor.ITALIC + "Your are now vanished!");
+					p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 400, 1));
+					minecarts.publicvoid.spyClock(p, 15);
+				}
 		}
+	}
 
-		 void tf2NoLoss(PlayerCommandPreprocessEvent e) {
-			String w = e.getPlayer().getWorld().getName();
-			if (!e.getMessage().contains("/tf2"))
-				return;
-			if (w.matches("pvp") || w.matches("pvp_nether")){
-					e.getPlayer().sendMessage(ChatColor.DARK_AQUA+"Doing this in pvp world will wipe your inventory!");
-					e.setCancelled(true);
-			}
+	void tf2NoLoss(PlayerCommandPreprocessEvent e) {
+		String w = e.getPlayer().getWorld().getName();
+		if (!e.getMessage().contains("/tf2"))
+			return;
+		if (w.matches("pvp") || w.matches("pvp_nether")) {
+			e.getPlayer().sendMessage(ChatColor.DARK_AQUA+ "Doing this in pvp world will wipe your inventory!");
+			e.setCancelled(true);
 		}
-
-		 void pvpChest(PlayerInteractEvent e) {
-			Block block = e.getClickedBlock();
-			if (block == null || block.getTypeId() != 54)
-				return;
-			if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
-				return;
-			if (!block.getWorld().getName().matches("pvp"))
-				return;
-			else {
+	}
+		 
+	void pvpChest(PlayerInteractEvent e) {
+		Material m = e.getMaterial();
+		if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
+			return;
+		else if (e.getPlayer().getWorld().getName().matches("pvp"))
+			if (m == Material.CHEST || m == Material.TRAPPED_CHEST)
 				e.setCancelled(false);
-				e.getPlayer().sendMessage(ChatColor.ITALIC + "You successfully made the chest open!");
-			}
-			
-		}
+	}
 }

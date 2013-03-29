@@ -91,10 +91,6 @@ import org.bukkit.event.player.PlayerKickEvent;
 	@EventHandler(priority = EventPriority.MONITOR)
 	  public void PvpSound(EntityDamageByEntityEvent e){
 		if (!e.isCancelled())
-			minecarts.publicvoid.pvpSound(e.getDamager(), e.getEntity());
-		if (!e.isCancelled())
-			minecarts.publicvoid.bowSound(e.getDamager(), e.getEntity());
-		if (!e.isCancelled())
 			minecarts.publicvoid.blindness(e.getEntity());
 	  }
 }
