@@ -12,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -28,7 +28,7 @@ public class DoubleJump implements Listener {
     ArrayList<String> jumpcooldown = new ArrayList<String>();
     
     @EventHandler(priority = EventPriority.MONITOR)
-    public void PlayerChangedWorldEvent(PlayerChangedWorldEvent e){
+    public void PlayerTeleportEvent(PlayerTeleportEvent e){
     	doubleJumpWorld(e.getPlayer());
     }
     
@@ -83,7 +83,7 @@ public class DoubleJump implements Listener {
     private void tf2(PlayerToggleFlightEvent event){
         Player p = event.getPlayer();
         String pl = p.getName();
-        Vector jump = p.getLocation().getDirection().multiply(0.4).setY(1.2);
+        Vector jump = p.getLocation().getDirection().multiply(0.4).setY(1);
         event.setCancelled(true);
     	if (!p.hasPotionEffect(PotionEffectType.SPEED))
     		return;
