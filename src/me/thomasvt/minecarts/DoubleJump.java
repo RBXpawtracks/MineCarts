@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
  
 public class DoubleJump implements Listener {
@@ -44,7 +45,8 @@ public class DoubleJump implements Listener {
     	setFlyOnJump(e);
     }
     
-    private void setFlyOnJump(PlayerToggleFlightEvent event) {
+    /*
+    private void old_setFlyOnJump(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
         String pl = player.getName();
         Vector jump = player.getLocation().getDirection().multiply(0.4).setY(1.2);
@@ -60,6 +62,49 @@ public class DoubleJump implements Listener {
 			}
 		}
 	}
+    */
+    private void setFlyOnJump(PlayerToggleFlightEvent event) {
+    	Player p = event.getPlayer();
+    	if (p.getGameMode().getValue() == 1)
+    		return;
+        String w = p.getWorld().getName();
+        if (w.matches("lobby") || w.matches("world")){
+        	lobbyOrWorld(event);
+        	event.setCancelled(true);
+        	return;
+        }
+        if (w.matches("tf2")){
+        	tf2(event);
+        	event.setCancelled(true);
+        	return;
+        }
+	}
+    
+    private void tf2(PlayerToggleFlightEvent event){
+        Player p = event.getPlayer();
+        String pl = p.getName();
+        Vector jump = p.getLocation().getDirection().multiply(0.4).setY(1.2);
+        event.setCancelled(true);
+    	if (!p.hasPotionEffect(PotionEffectType.SPEED))
+    		return;
+    	if (p.getInventory().getChestplate().getType() == Material.LEATHER_CHESTPLATE){
+    		if(!jumpcooldown.contains(pl)) {
+            	p.setVelocity(p.getVelocity().add(jump));
+            	startDoubleJump(p);
+    		}
+    	}
+    }
+    
+    private void lobbyOrWorld(PlayerToggleFlightEvent event){
+        Player player = event.getPlayer();
+        String pl = player.getName();
+        Vector jump = player.getLocation().getDirection().multiply(0.4).setY(1.2);
+        event.setCancelled(true);
+        if(!jumpcooldown.contains(pl)) {
+        	player.setVelocity(player.getVelocity().add(jump));
+        	startDoubleJump(player);
+		}
+    }
     
 	private void startDoubleJump(final Player p){
 		minecarts.getServer().getScheduler().scheduleSyncDelayedTask(minecarts, new Runnable() {
@@ -67,21 +112,18 @@ public class DoubleJump implements Listener {
 						if (p == null)
 							return;
 						String pl = p.getName();
-						String w = p.getWorld().getName();
-						if (w.matches("world") || w.matches("lobby")) {
-							Location loc = p.getLocation();
-							p.setFallDistance(-10);
-							p.setExp(0);
-							p.setFlying(false);
-							p.setAllowFlight(false);
-							p.playSound(loc, Sound.GHAST_FIREBALL, 1F, 1F);
-							jumpcooldown.add(pl);
-							warmUp(pl);
-						}
+						Location loc = p.getLocation();
+						p.setFallDistance(-10);
+						p.setExp(0);
+						p.setFlying(false);
+						p.setAllowFlight(false);
+						p.playSound(loc, Sound.GHAST_FIREBALL, 1F, 1F);
+						jumpcooldown.add(pl);
+						warmUp(pl);
 					}
 				}, 0);
-    }
-    
+	}
+
 	private void doubleJumpWorld(final Player p){
 		minecarts.getServer().getScheduler().scheduleSyncDelayedTask(minecarts, new Runnable() {
 			public void run() {

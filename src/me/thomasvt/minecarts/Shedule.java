@@ -1,5 +1,8 @@
 package me.thomasvt.minecarts;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -13,9 +16,24 @@ import org.bukkit.entity.Player;
 	Shedule(Minecarts minecarts) {
 		this.minecarts = minecarts;
 	}
+	
+	 @SuppressWarnings("deprecation")
+	private void clearLog() {
+		minecarts.getServer().getScheduler().scheduleAsyncRepeatingTask(minecarts, new Runnable() {
+			public void run() {
+				try {
+					BufferedWriter out = new BufferedWriter(new FileWriter("server.log"));
+					out.flush();
+					out.close();
+				} catch (Exception e) {
+					minecarts.getLogger().warning("Something went wrong while clearing the log");
+				}
+			}
+		}, 6000, 6000);
+	}
 
 	@SuppressWarnings("deprecation")
-	 void donateReminder(){
+	 private void donateReminder(){
 		minecarts.getServer().getScheduler().scheduleAsyncRepeatingTask(minecarts, new Runnable() {
 		      public void run() {
 		    		Bukkit.broadcastMessage(ChatColor.AQUA+"$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$");
@@ -79,5 +97,6 @@ import org.bukkit.entity.Player;
 		noSpawnChunks();
 		donateReminder();
 		clearList();
+		clearLog();
 	}
 }

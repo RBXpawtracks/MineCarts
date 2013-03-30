@@ -41,7 +41,6 @@ public class Minecarts extends JavaPlugin implements Listener {
 	JoinCarts joincarts = new JoinCarts(this);
 	Listeners listeners = new Listeners(this);
 	MineScare minescare = new MineScare(this);
-	LogClear logclear = new LogClear(this);
 	NewEmail newemail = new NewEmail(this);
 	
 	public int getInt(String conf){
@@ -64,7 +63,6 @@ public class Minecarts extends JavaPlugin implements Listener {
 		shedule.scheduler();
 		setupEconomy();
 		costumitems.addRecipes();
-		logclear.startShedule();
 	}
 	
 	private boolean setupEconomy() {

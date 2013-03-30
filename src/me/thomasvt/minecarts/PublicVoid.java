@@ -64,24 +64,6 @@ import org.bukkit.potion.PotionEffectType;
 		}, 0);
 	}
 	
-	public int totalBuildersOnline(){
-		int builders = 0;
-		for (Player p : Bukkit.getOnlinePlayers()){
-			if (p.hasPermission("minecarts.builder"))
-				builders++;
-		}
-		return builders;
-	}
-	
-	public int totalStaffOnline(){
-		int staff = 0;
-		for (Player p : Bukkit.getOnlinePlayers()){
-			if (p.hasPermission("minecarts.staff"))
-				staff++;
-		}
-		return staff;
-	}
-	
 	public String totalOnline(){
 		String respond = minecarts.getServer().getOnlinePlayers().length + "/" + minecarts.getServer().getMaxPlayers();
 		return respond;
@@ -104,8 +86,7 @@ import org.bukkit.potion.PotionEffectType;
 				p.sendMessage(ChatColor.GREEN + "Welcome to MineCarts!");
 				p.sendMessage(ChatColor.GREEN + "We are a 24/7 NoLagg Creative & PVP server");
 				p.sendMessage(ChatColor.GREEN + "Online players: " + totalOnline());
-				p.sendMessage(ChatColor.GREEN + "Plugins: " + ChatColor.YELLOW + "Factions, PlotMe, PVPGuns. and much more!");
-				p.sendMessage(ChatColor.GREEN + "Your balance: "+ minecarts.econ.getBalance(p.getName()));
+				p.sendMessage(ChatColor.GREEN + "Plugins: " + ChatColor.YELLOW + "Factions, PlotMe, Guns. and much more!");
 				p.sendMessage(ChatColor.GRAY + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			}
 		}, 25);
